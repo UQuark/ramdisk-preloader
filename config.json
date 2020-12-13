@@ -1,0 +1,28 @@
+{
+    "ramdisks": [
+        {
+            "location": "world",
+            "size": "2048M"
+        }
+    ],
+
+    "load": [
+        {
+            "from": "world_save/*",
+            "to": "world"
+        }
+    ],
+
+    "save": [
+        {
+            "from": "world/*",
+            "to": "world_save"
+        }
+    ],
+
+    "period": 5,
+    "chown_uid": 1000,
+    "chown_gid": 998,
+    "user": "uquark",
+    "execute": "./start.sh"
+}
