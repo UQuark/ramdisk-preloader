@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -106,7 +107,7 @@ func execute() error {
 	log.Printf("Starting")
 
 	cmd := exec.Command("sudo", "-u", config.User, config.Execute)
-	err := cmd.Run()
+	err := cmd.Start()
 	if err != nil {
 		return err
 	}
@@ -156,13 +157,19 @@ func run() error {
 		return err
 	}
 
+	err = execute()
+	if err != nil {
+		log.Printf("Failed to execute\n%v", err)
+	}
+
 	running := true
+
 	go func() {
-		err = execute()
-		if err != nil {
-			log.Printf("Failed to execute\n%v", err)
+		var cmd string
+		fmt.Scanln(&cmd)
+		if cmd == "quit" {
+			running = false
 		}
-		running = false
 	}()
 
 	for running {
@@ -173,6 +180,8 @@ func run() error {
 		time.Sleep(time.Duration(config.Period) * time.Second)
 	}
 
+	log.Println("Final save")
+
 	err = save()
 	if err == nil {
 		unmountRAMDisks()
@@ -180,7 +189,7 @@ func run() error {
 	}
 
 	log.Printf("Final save failed, won't unmount ramdisks\n%v", err)
-	return err
+	return nil
 }
 
 func main() {
@@ -198,6 +207,6 @@ func main() {
 
 	err := run()
 	if err != nil {
-		log.Print(err)
+		log.Println(err)
 	}
 }
